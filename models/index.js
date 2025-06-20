@@ -1,18 +1,24 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
 
-// Database configuration - PostgreSQL for production, SQLite for development
+// Database configuration - Support for external free databases
 const sequelize = process.env.NODE_ENV === 'production' ? 
   new Sequelize({
     dialect: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'workforce_management',
-    username: process.env.DB_USER || 'wfm_user',
-    password: process.env.DB_PASSWORD || 'secure_password_123',
+    host: process.env.EXTERNAL_DB_HOST || process.env.DB_HOST || 'localhost',
+    port: process.env.EXTERNAL_DB_PORT || process.env.DB_PORT || 5432,
+    database: process.env.EXTERNAL_DB_NAME || process.env.DB_NAME || 'workforce_management',
+    username: process.env.EXTERNAL_DB_USER || process.env.DB_USER || 'wfm_user',
+    password: process.env.EXTERNAL_DB_PASSWORD || process.env.DB_PASSWORD || 'secure_password_123',
+    dialectOptions: {
+      ssl: process.env.DB_SSL === 'true' ? {
+        require: true,
+        rejectUnauthorized: false
+      } : false
+    },
     logging: false,
     pool: {
-      max: 20,
+      max: 5, // Reduced for free tiers
       min: 0,
       acquire: 30000,
       idle: 10000
