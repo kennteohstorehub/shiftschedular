@@ -61,18 +61,41 @@ A comprehensive workforce management solution designed specifically for customer
 
 ## ⚡ Quick Start
 
-### Installation
+### Option 1: Docker (Recommended for Production & Multi-Manager Setup)
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd ShiftAdjuster
+git clone https://github.com/kennteohstorehub/shiftschedular.git
+cd shiftschedular
+
+# Set up environment
+cp env.example .env
+# Edit .env with your configurations
+
+# Start all services (PostgreSQL, Redis, Application, Nginx)
+docker-compose up -d
+
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+```
+
+The application will be available at `http://localhost:3000`
+
+### Option 2: Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/kennteohstorehub/shiftschedular.git
+cd shiftschedular
 
 # Install dependencies
 npm install
 
 # Create environment file
-cp .env.example .env
+cp env.example .env
 
 # Initialize database and seed sample data
 npm run seed
@@ -229,7 +252,38 @@ npm run test:coverage
 
 ## 🚀 Deployment
 
-### Production Setup
+### Docker Deployment (Recommended)
+
+For production deployment with shared database access for multiple managers:
+
+1. **Build and Push Docker Image**
+```bash
+# Make build script executable
+chmod +x build-and-push.sh
+
+# Build and push to Docker Hub
+./build-and-push.sh
+
+# Or build locally
+docker build -t kennteohstorehub/shiftadjuster:latest .
+```
+
+2. **Production Deployment**
+```bash
+# Use production docker-compose
+docker-compose -f docker-compose.prod.yml up -d
+
+# Or deploy to cloud providers
+# See DEPLOYMENT.md for detailed instructions
+```
+
+3. **Access Management**
+- **Shared Database**: PostgreSQL with real-time synchronization
+- **Multi-Manager Access**: All 3 managers can access simultaneously
+- **Real-time Updates**: WebSocket-based live collaboration
+- **Cost**: ~$25-50/month for cloud hosting
+
+### Traditional Server Setup
 
 1. **Environment Configuration**
 ```bash
@@ -246,6 +300,25 @@ npm run migrate
 # Seed production data
 npm run seed:production
 ```
+
+### Hosting Options for 3 Managers
+
+1. **Cloud VPS** (Recommended)
+   - DigitalOcean, Linode, Vultr
+   - 2-4 vCPUs, 4-8GB RAM
+   - Cost: $20-40/month
+
+2. **Container Services**
+   - AWS ECS, Google Cloud Run
+   - Auto-scaling, managed infrastructure
+   - Cost: $30-60/month
+
+3. **Platform as a Service**
+   - Heroku, Railway, Render
+   - Simplified deployment
+   - Cost: $25-50/month
+
+See `DEPLOYMENT.md` for comprehensive deployment instructions.
 
 3. **Start Production Server**
 ```bash

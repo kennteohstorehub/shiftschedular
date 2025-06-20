@@ -1,16 +1,36 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
 
-// Database configuration
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(__dirname, '../database.sqlite'),
-  logging: process.env.NODE_ENV === 'development' ? console.log : false,
-  define: {
-    timestamps: true,
-    underscored: true,
-  },
-});
+// Database configuration - PostgreSQL for production, SQLite for development
+const sequelize = process.env.NODE_ENV === 'production' ? 
+  new Sequelize({
+    dialect: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'workforce_management',
+    username: process.env.DB_USER || 'wfm_user',
+    password: process.env.DB_PASSWORD || 'secure_password_123',
+    logging: false,
+    pool: {
+      max: 20,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
+    define: {
+      timestamps: true,
+      underscored: true,
+    },
+  }) :
+  new Sequelize({
+    dialect: 'sqlite',
+    storage: path.join(__dirname, '../database.sqlite'),
+    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    define: {
+      timestamps: true,
+      underscored: true,
+    },
+  });
 
 // Import models
 const Agent = require('./Agent')(sequelize);
